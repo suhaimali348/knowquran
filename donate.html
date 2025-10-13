@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Donate - Suhaim Soft</title>
+  <link rel="icon" href="images/quran.png">
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    :root {
+      --primary-color: #4f46e5;
+      --secondary-color: #0d9488;
+      --text-dark: #111827;
+      --text-light: #6b7280;
+      --border-color: #d1d5db;
+      --white: #ffffff;
+      --light-bg: #f9fafb;
+      --gradient-start: #4f46e5;
+      --gradient-end: #a855f7;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+      background-color: #111827;
+      overflow: hidden;
+    }
+
+    #particle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+
+    .container {
+      position: relative;
+      background: rgba(255, 255, 255, 0.65);
+      backdrop-filter: blur(15px) saturate(150%);
+      -webkit-backdrop-filter: blur(15px) saturate(150%);
+      padding: 32px;
+      border-radius: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      animation: popIn 0.7s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+      opacity: 0;
+    }
+
+    .corner-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background-color: #e5e7eb;
+      color: var(--text-light);
+      border-radius: 50%;
+      font-size: 18px;
+      font-weight: 600;
+      line-height: 1;
+      cursor: pointer;
+      display: flex; 
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 10;
+    }
+    .corner-btn:hover {
+      background-color: #d1d5db;
+      transform: scale(1.1) rotate(90deg);
+    }
+    
+    #back-btn { display: none; }
+
+    .header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+      background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end), var(--gradient-start));
+      background-size: 200% auto;
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      animation: textShine 5s linear infinite;
+    }
+    
+    .header p { margin: 0 0 24px 0; color: var(--text-light); }
+    input[type="number"] { width: 100%; padding: 14px; font-size: 16px; border: 1px solid var(--border-color); border-radius: 12px; box-sizing: border-box; transition: all 0.3s ease; background-color: var(--light-bg); }
+    input[type="number"]:focus { border-color: var(--primary-color); box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.2); background-color: var(--white); outline: none; }
+    
+    button { width: 100%; padding: 14px; font-size: 16px; font-weight: 600; border: none; color: white; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; margin-top: 12px; }
+    button:not(.corner-btn):hover { transform: translateY(-4px); box-shadow: 0 8px 25px rgba(79, 70, 229, 0.25); }
+
+    .btn-donate { background: linear-gradient(to right, var(--gradient-start), var(--gradient-end)); }
+    #download-bill { background: var(--secondary-color); }
+    #make-another-donation { background: var(--text-light); }
+    #make-another-donation:hover { background: #4b5563; box-shadow: 0 8px 25px rgba(107, 114, 128, 0.25); }
+    
+    #payment-info-section { display: none; animation: fadeIn 0.5s ease-in-out; }
+    #qr-code { width: 180px; height: 180px; margin: 15px auto; border-radius: 16px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); display: block; transition: transform 0.3s ease; }
+    #qr-code:hover { transform: scale(1.05); }
+
+    @keyframes popIn { from { opacity: 0; transform: translateY(20px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes textShine { to { background-position: 200% center; } }
+  </style>
+</head>
+<body>
+  <canvas id="particle-canvas"></canvas>
+
+  <div class="container">
+    <button id="dashboard-btn" class="corner-btn" onclick="goToDashboard()" title="Go to Dashboard">×</button>
+    <button id="back-btn" class="corner-btn" onclick="resetForm()" title="Go Back">×</button>
+    
+    <div class="header">
+        <h2>Suhaim Soft</h2>
+        <p>Secure UPI Donation</p>
+    </div>
+
+    <div id="donation-form">
+      <div class="input-group">
+        <input id="amount" type="number" placeholder="Enter Amount (₹)" min="1" />
+      </div>
+      <button class="btn-donate" onclick="initiatePayment()">Proceed to Donate</button>
+    </div>
+
+    <div id="payment-info-section">
+      <p>Scan the QR to complete your payment of <strong>₹<span id="qr-amount"></span></strong>.</p>
+      <img id="qr-code" src="" alt="UPI QR Code" />
+      <button id="download-bill" onclick="generateBillPDF()">Download Receipt</button>
+      <button id="make-another-donation" onclick="resetForm()">Make Another Donation</button>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <script>
+    const UPI_ID = "8891479505@fam";
+    const PAYEE_NAME = "Suhaim Soft";
+    let currentAmount = 0;
+    // Base64 encoded logo for the PDF
+    const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAARRSURBVFhHzZlriFxVFMd/72bV6EcTQkQUQVAsECGCIoIiKgoiCGIoKhgiKEIRCiLiQhFxkYggCFZCrESwEFSU0IciUkyFRFqqpL6I0mAk1Xb2jO39+Xef2dnZmdl1U/ODmZ29d/7/nPuda++1jRhjxIgRI4qKqurEwP9K4Xk6Sg1g70GfYr9hP2G/wz5GkG/A3sU+wH5EUPBPSl6lqZcW8J+RjH1sA+wnLPLBEjC9KkkHIMg/YD/N+o/j/gL2Y/QvWwL5R0qeVsS3oJ9j/2Y/Y38C+RT7SUD8kZJtSqqyA/YZ9hP2Lfbz1P0L9sP+D+tA3hC9KUmXVGB2Afsx+gb7f/Y29lWBLw8gqC5uQj9jb2P/Yj8C+SL7aUBcIEkflmJ8BfsW+xH7FfuH+xP7P/sC+UjJNqVU4TbgCex/7CfsJ+zH6F+yH/c/d/0X5L2SL0oqk+K6A/YF9jf2Y/YH9in2U+Tv0h2yryiVSpkYJzXgaexv7CfsJ+z36f+j/oM6gHwh+ZWkG2WpDqP+wH7Bfsd+gv1H/R/1L/Y99nUBNyC/iF4l6VwVpxuwv7HfsJ+xv7BfsL8C5M/SAbKvKJWmC/E72O/Y/7Bfsa+wv6F/Q/4H5L0SL5L0WwW/G/sB+x/7CfsJ+xH7M/pXqXn/w/7X/sW+D+Uf6GfsJ+wv+j9E/hD9ipSyLClWcWwN9kf2E/Zr9Nf0VqV+CfsV+zv6D/oX5LUp+yV5jWkG/CftL+x/7PfsX+xv7G/s5+j/ov6r/BfIukl+iVKa9qB/S/s5+mv6a/or9G/sL+xH7f1hBwL9Jfgf5R1kpk0L8AfsZ+wf7M/sf+2f0n+m/Qn8B+UvJUqWUaV3/AfsL+gf6H/p79B+hf6b/K/o/6v+BvC/5v6TyP4Cg/6T/B/0b+k/2D/YP9rf0R0q6Lql0L0R/Qf8g+4+k8k9L/hf1P+kf03/W/0X/S/2b/Yn9nf0d9m0BBv1t+pv0V+jv6H/o/xT6T/oP9D/qH5C/oH5H0u+S8u+S/I9k/ydZ/qfE/4B9mf0p9kfy15KUpSyVpTqE+n/0B+xv7B/sB+x/6C/o39P+A/K/kvxLUpkyLYq7G7Bfsx+zf6L/Qf+b/nf979k/kL9K/iGpfJ9k/0f/m/4n9B/oP9Jf9F+V/C/JH0n6H0lXSlItyqS+AfsX+wf7M/sR+zv0H/S/aX9P/4d0h+Q/Jt5R8T8qfS/IT5F+V/G8l+RdJ8mOS3S82JkSOK3A/uHh7L2hPjdAAAAAElFTkSuQmCC";
+
+    // --- Particle Animation (unchanged) ---
+    const canvas = document.getElementById('particle-canvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; let particlesArray; function initParticles(){particlesArray=[];for(let i=0;i<80;i++){particlesArray.push(new Particle())}} class Particle{constructor(){this.x=Math.random()*canvas.width;this.y=Math.random()*canvas.height;this.size=Math.random()*1.5+1;this.speedX=(Math.random()*1-0.5);this.speedY=(Math.random()*1-0.5)}update(){this.x+=this.speedX;this.y+=this.speedY;if(this.x>canvas.width||this.x<0){this.speedX=-this.speedX}if(this.y>canvas.height||this.y<0){this.speedY=-this.speedY}}draw(){ctx.fillStyle='rgba(255,255,255,0.8)';ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fill()}} function animateParticles(){ctx.clearRect(0,0,canvas.width,canvas.height);for(let i=0;i<particlesArray.length;i++){particlesArray[i].update();particlesArray[i].draw()}requestAnimationFrame(animateParticles)} window.addEventListener('resize',()=>{canvas.width=window.innerWidth;canvas.height=window.innerHeight;initParticles();}); initParticles(); animateParticles();
+
+    // --- Core Functions ---
+    function goToDashboard() { window.location.href = 'Qruan.html'; }
+
+    function initiatePayment() {
+      const amountInput = document.getElementById('amount');
+      currentAmount = parseFloat(amountInput.value);
+      if (isNaN(currentAmount) || currentAmount < 1) {
+        alert('Please enter a valid amount (minimum ₹1)');
+        amountInput.focus();
+        return;
+      }
+      document.getElementById('donation-form').style.display = 'none';
+      document.getElementById('payment-info-section').style.display = 'block';
+      document.getElementById('dashboard-btn').style.display = 'none';
+      document.getElementById('back-btn').style.display = 'flex';
+      const upiPayUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&tn=Donation&am=${currentAmount.toFixed(2)}&cu=INR`;
+      document.getElementById('qr-amount').textContent = currentAmount.toFixed(2);
+      document.getElementById('qr-code').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiPayUrl)}&qzone=1`;
+      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+        window.location.href = upiPayUrl;
+      }
+    }
+
+    /**
+     * Generates the redesigned PDF receipt with a clickable link.
+     */
+    function generateBillPDF() {
+        if (currentAmount < 1) {
+            alert("Please initiate a donation first.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+
+        // ---- PDF Content ----
+
+        // 1. Header Box
+        doc.setFillColor(45, 55, 72); // Dark gray header
+        doc.rect(0, 0, pageWidth, 40, 'F');
+        
+        // Add Logo
+        if (LOGO_BASE64) {
+            try { doc.addImage(LOGO_BASE64, 'PNG', margin, 10, 20, 20); } 
+            catch (e) { console.error("Could not add logo to PDF:", e); }
+        }
+        
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(20);
+        doc.setTextColor(255, 255, 255);
+        doc.text("Donation Receipt", pageWidth / 2, 25, { align: "center" });
+
+        // 2. Transaction Details
+        let y = 60;
+        const transactionId = "DON-" + Date.now().toString().slice(-8);
+        const formattedDate = new Date().toLocaleDateString("en-IN", {
+            day: "2-digit", month: "short", year: "numeric"
+        });
+        
+        doc.setFontSize(11);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(107, 114, 128); // Gray for labels
+        doc.text("Transaction ID", margin, y);
+        doc.setTextColor(30, 30, 30);
+        doc.text(transactionId, margin, y + 6);
+        
+        doc.setTextColor(107, 114, 128);
+        doc.text("Date", pageWidth - margin, y, { align: "right" });
+        doc.setTextColor(30, 30, 30);
+        doc.text(formattedDate, pageWidth - margin, y + 6, { align: "right" });
+        y += 20;
+
+        // 3. Line separator
+        doc.setDrawColor(226, 232, 240);
+        doc.line(margin, y, pageWidth - margin, y);
+        y += 15;
+
+        // 4. Payee and Amount
+        doc.setFontSize(11);
+        doc.setTextColor(107, 114, 128);
+        doc.text("PAID TO", margin, y);
+        doc.text("AMOUNT", pageWidth - margin, y, { align: "right" });
+        y += 8;
+
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(16);
+        doc.setTextColor(30, 30, 30);
+        doc.text(PAYEE_NAME, margin, y);
+        doc.text(`₹ ${currentAmount.toFixed(2)}`, pageWidth - margin, y, { align: "right" });
+        y += 25;
+
+        // 5. Footer Section with CLICKABLE LINK
+        doc.setDrawColor(226, 232, 240);
+        doc.line(margin, pageHeight - 40, pageWidth - margin, pageHeight - 40);
+        
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(107, 114, 128);
+        doc.text("Generated by knowquran.in", pageWidth / 2, pageHeight - 30, { align: "center" });
+
+        // Create the clickable link
+        const linkText = "Visit us at knowquran.in";
+        const linkUrl = "https://knowquran.in/";
+        const textWidth = doc.getTextWidth(linkText);
+        const textX = (pageWidth - textWidth) / 2;
+        const textY = pageHeight - 24;
+        
+        doc.setTextColor(79, 70, 229); // Use primary color for the link
+        doc.textWithLink(linkText, textX, textY, { url: linkUrl });
+
+        // Save the PDF
+        doc.save(`Donation_Receipt_${transactionId}.pdf`);
+    }
+
+    function resetForm() {
+      document.getElementById('payment-info-section').style.display = 'none';
+      document.getElementById('donation-form').style.display = 'block';
+      document.getElementById('back-btn').style.display = 'none';
+      document.getElementById('dashboard-btn').style.display = 'flex';
+      document.getElementById('amount').value = '';
+      currentAmount = 0;
+      document.getElementById('amount').focus();
+    }
+  </script>
+</body>
+</html>

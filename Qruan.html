@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>knowquran</title>
+  
+    <link rel="manifest" href="manifest.json">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="images/quran.png">
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="knowquran is your comprehensive online platform for Quranic recitation, Tafsir, Hifz tracking, Qibla direction, Prayer Times, and more. Enhance your spiritual journey with our easy-to-use tools.">
+    <meta name="keywords" content="Quran, Islam, Islamic app, Quran recitation, Tafsir, Hifz, Qibla, Prayer Time, Muslim, Islamic tools, knowquran, online Quran, audio Quran, offline Quran">
+    <meta name="author" content="knowquran">
+    <meta property="og:title" content="knowquran - Your Companion for Quranic Recitation & Islamic Tools">
+    <meta property="og:description" content="knowquran is your comprehensive online platform for Quranic recitation, Tafsir, Hifz tracking, Qibla direction, Prayer Times, and more. Enhance your spiritual journey with our easy-to-use tools.">
+    <meta property="og:image" content="https://www.yourwebsite.com/images/og-image.jpg">
+    <meta property="og:url" content="https://www.yourwebsite.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="knowquran - Your Companion for Quranic Recitation & Islamic Tools">
+    <meta name="twitter:description" content="knowquran is your comprehensive online platform for Quranic recitation, Tafsir, Hifz tracking, Qibla direction, Prayer Times, and more. Enhance your spiritual journey with our easy-to-use tools.">
+    <meta name="twitter:image" content="https://www.yourwebsite.com/images/twitter-image.jpg">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            background-color: #f0f4f8;
+            color: #2c3e50;
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: #1a202c;
+            color: #e2e8f0;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            color: white;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeOut 0.5s ease-out 2s forwards;
+        }
+
+        #loading-screen .spinner {
+            border: 8px solid rgba(255, 255, 255, 0.3);
+            border-top: 8px solid #facc15;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; visibility: visible; }
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideInFromLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInFromRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+        }
+        .navbar .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #facc15;
+            letter-spacing: 1px;
+        }
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 12px;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar ul li a {
+            text-decoration: none;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: background 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .navbar ul li a:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        .mode-toggle {
+            background: #facc15;
+            color: #1e3a8a;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            margin-left: 10px;
+        }
+        .mode-toggle:hover {
+            background: #fbbf24;
+            transform: translateY(-2px);
+        }
+        .theme-toggle {
+            background: #facc15;
+            color: #1e3a8a;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .theme-toggle:hover {
+            background: #fbbf24;
+            transform: scale(1.1);
+        }
+        .menu-toggle {
+            display: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #facc15;
+        }
+        @media (max-width: 992px) {
+            .navbar ul {
+                display: none;
+                flex-direction: column;
+                background: #1e3a8a;
+                position: absolute;
+                top: 70px;
+                right: 20px;
+                width: 280px;
+                border-radius: 10px;
+                padding: 20px;
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            }
+            .navbar ul.active {
+                display: flex;
+            }
+            .navbar ul li {
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .navbar ul li a {
+                padding: 12px;
+                font-size: 15px;
+            }
+            .menu-toggle {
+                display: block;
+            }
+            .theme-toggle, .mode-toggle {
+                margin-left: auto;
+            }
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+            width: 100%;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/arabesque.png');
+            opacity: 0.1;
+        }
+        .header h1 {
+            font-size: 52px;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            animation: slideInFromLeft 1s ease-out 0.5s backwards;
+        }
+        .header p {
+            font-size: 22px;
+            margin-top: 20px;
+            font-weight: 300;
+            animation: slideInFromRight 1s ease-out 0.7s backwards;
+        }
+
+        /* About Section */
+        .about-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            padding: 60px 20px;
+            background-color: #ffffff;
+            margin: 30px auto;
+            max-width: 1200px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 1s;
+        }
+        .about-section .image-container {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            text-align: center;
+        }
+        .about-section .content {
+            flex: 1.5;
+            min-width: 300px;
+            padding: 20px;
+            text-align: left;
+        }
+        .about-section h2 {
+            color: #10b981;
+            font-size: 40px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 12px;
+        }
+        .about-section h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(to right, #facc15, #10b981);
+        }
+        .about-section p {
+            color: #4b5563;
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .about-section .cta-button {
+            background: linear-gradient(135deg, #facc15, #fbbf24);
+            color: #1e3a8a;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: inline-block;
+        }
+        .about-section .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 3D Cube Animation */
+        .features-cube-container {
+            width: 280px;
+            height: 280px;
+            perspective: 1200px;
+            margin: 50px auto;
+        }
+        .features-cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateCube 12s infinite linear;
+        }
+        .cube-face {
+            position: absolute;
+            width: 280px;
+            height: 280px;
+            background: linear-gradient(135deg, #10b981, #34d399);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            border: 3px solid #facc15;
+            border-radius: 15px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .cube-face:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+        }
+        .cube-face i {
+            font-size: 50px;
+            margin-bottom: 12px;
+            animation: bounce 2s infinite;
+        }
+        .cube-face h3 {
+            margin: 5px 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .cube-face p {
+            font-size: 15px;
+            color: #e6f3f3;
+        }
+        .front  { transform: rotateY(0deg) translateZ(140px); }
+        .back   { transform: rotateY(180deg) translateZ(140px); }
+        .right  { transform: rotateY(90deg) translateZ(140px); }
+        .left   { transform: rotateY(-90deg) translateZ(140px); }
+        .top    { transform: rotateX(90deg) translateZ(140px); }
+        .bottom { transform: rotateX(-90deg) translateZ(140px); }
+        @keyframes rotateCube {
+            0%   { transform: rotateX(0deg) rotateY(0deg); }
+            100% { transform: rotateX(360deg) rotateY(360deg); }
+        }
+
+        /* Back to Top Button */
+        .back-to-top {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            background: linear-gradient(135deg, #facc15, #fbbf24);
+            color: #1e3a8a;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s, transform 0.2s;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+        }
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        .back-to-top:hover {
+            transform: scale(1.1);
+        }
+
+        /* Main App Content */
+        .main-app-content {
+            min-height: 50vh;
+            padding: 50px 20px;
+            max-width: 1200px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 1.5s;
+        }
+        .main-app-content h2 {
+            color: #10b981;
+            font-size: 34px;
+            margin-bottom: 25px;
+        }
+        .main-app-content p {
+            font-size: 18px;
+            line-height: 1.7;
+            max-width: 800px;
+            margin: 0 auto 30px;
+            color: #4b5563;
+        }
+        .main-app-content .app-button {
+            background: linear-gradient(135deg, #facc15, #fbbf24);
+            color: #1e3a8a;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .main-app-content .app-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #ffffff;
+            padding: 40px 20px;
+            text-align: center;
+            width: 100%;
+            position: relative;
+            animation: fadeIn 1s ease-out;
+        }
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://www.transparenttextures.com/patterns/arabesque.png');
+            opacity: 0.15;
+            z-index: 0;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            gap: 20px;
+        }
+        .footer-section {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        .footer-section h3 {
+            color: #facc15;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+        .footer-section ul li a {
+            color: #ffffff;
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .footer-section ul li a:hover {
+            color: #facc15;
+            transform: translateX(5px);
+        }
+        .footer-section form {
+            display: flex;
+            flex-direction: column;
+        }
+        .footer-section label {
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #d1d5db;
+        }
+        .footer-section input,
+        .footer-section textarea {
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #6b7280;
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+        .footer-section button {
+            padding: 10px;
+            background: #facc15;
+            color: #1e3a8a;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .footer-section button:hover {
+            background: #fbbf24;
+        }
+        .social-links .social-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        .social-links .social-icons a {
+            color: #ffffff;
+            font-size: 20px;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .social-links .social-icons a:hover {
+            color: #facc15;
+            transform: scale(1.2);
+        }
+        .footer p {
+            font-size: 14px;
+            color: #d1d5db;
+            margin-top: 20px;
+        }
+
+        /* WhatsApp Chat Button */
+        .chat-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 34px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s, background 0.3s;
+            z-index: 1000;
+        }
+        .chat-btn:hover {
+            background: #1DA851;
+            transform: scale(1.1);
+        }
+        .whatsapp-links {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            display: none;
+            z-index: 999;
+        }
+        .whatsapp-links a {
+            display: flex;
+            align-items: center;
+            color: #facc15;
+            text-decoration: none;
+            margin: 10px 0;
+            font-size: 18px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .whatsapp-links a i {
+            margin-right: 12px;
+            font-size: 24px;
+        }
+        .whatsapp-links a:hover {
+            color: #fef08a;
+        }
+
+        @media (max-width: 992px) {
+            .about-section {
+                flex-direction: column;
+                text-align: center;
+            }
+            .about-section .content {
+                text-align: center;
+            }
+            .about-section h2::after {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .footer-content {
+                flex-direction: column;
+                align-items: center;
+            }
+            .footer-section {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+            .header h1 {
+                font-size: 40px;
+            }
+            .header p {
+                font-size: 18px;
+            }
+        }
+        @media (max-width: 576px) {
+            .navbar {
+                padding: 15px;
+            }
+            .navbar .logo {
+                font-size: 24px;
+            }
+            .navbar ul li a {
+                font-size: 13px;
+                padding: 8px;
+            }
+            .header {
+                padding: 60px 15px;
+            }
+            .header h1 {
+                font-size: 32px;
+            }
+            .header p {
+                font-size: 16px;
+            }
+            .about-section {
+                padding: 40px 15px;
+            }
+            .main-app-content {
+                padding: 40px 15px;
+            }
+            .footer-section h3 {
+                font-size: 18px;
+            }
+            .footer-section ul li a {
+                font-size: 14px;
+            }
+            .social-links .social-icons a {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <span>Loading knowquran...</span>
+    </div>
+
+    <nav class="navbar">
+        <div class="logo">knowquran</div>
+        <span class="menu-toggle" onclick="toggleMenu()" aria-label="Toggle Menu"><i class="fas fa-bars"></i></span>
+        <ul id="navbar-menu">
+            <li><a href="#home" aria-label="Home"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="#about" aria-label="About"><i class="fas fa-info-circle"></i> About</a></li>
+            <li><a href="#contact" aria-label="Contact"><i class="fas fa-envelope"></i> Contact</a></li>
+            <li><a href="surahs.html" aria-label="Surah"><i class="fas fa-book-open"></i> Surah</a></li>
+            <li><a href="tafser.html" aria-label="Tafsir"><i class="fas fa-book"></i> Tafsir</a></li>
+            <li><a href="tafseer Audio.html" aria-label="Tafsir Audio"><i class="fas fa-volume-up"></i> Tafsir Audio</a></li>
+            <li><a href="donate.html" aria-label="Donate"><i class="fas fa-donate"></i> Donate</a></li>
+            <li><a href="qibla.html" aria-label="Qibla"><i class="fas fa-compass"></i> Qibla</a></li>
+            <li><a href="ptime.html" aria-label="Prayer Time"><i class="fas fa-pray"></i> Prayer Time</a></li>
+            <li><a href="hifz.html" aria-label="Hifz"><i class="fas fa-heart"></i> Hifz</a></li>
+            <li><a href="Tasbih.html" aria-label="Tasbeeh"><i class="fas fa-praying-hands"></i> Tasbeeh</a></li>
+        </ul>
+    </nav>
+
+    <div class="header" id="home">
+        <h1>Welcome to knowquran</h1>
+        <p>Your companion for daily Quranic recitation and Islamic tools.</p>
+    </div>
+
+    <div class="about-section" id="about">
+        <div class="image-container">
+            <div class="features-cube-container">
+                <div class="features-cube">
+                    <div class="cube-face front">
+                        <i class="fas fa-book-open"></i>
+                        <h3>Surah</h3>
+                        <p>Explore and read Quranic Surahs with ease.</p>
+                    </div>
+                    <div class="cube-face back">
+                        <i class="fas fa-book"></i>
+                        <h3>Tafsir</h3>
+                        <p>Understand the Quran with detailed explanations.</p>
+                    </div>
+                    <div class="cube-face right">
+                        <i class="fas fa-volume-up"></i>
+                        <h3>Tafsir Audio</h3>
+                        <p>Listen to Tafsir narrations for deeper insight.</p>
+                    </div>
+                    <div class="cube-face left">
+                        <i class="fas fa-heart"></i>
+                        <h3>Hifz</h3>
+                        <p>Track your Quran memorization progress.</p>
+                    </div>
+                    <div class="cube-face top">
+                        <i class="fas fa-cloud-download-alt"></i>
+                        <h3>Offline Mode</h3>
+                        <p>Access Quran features offline.</p>
+                    </div>
+                    <div class="cube-face bottom">
+                        <i class="fas fa-praying-hands"></i>
+                        <h3>Tasbeeh</h3>
+                        <p>Count your daily dhikr and praises easily.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="content">
+            <h2>The Holy Quran</h2>
+            <p>The Quran is the holy book of Islam, believed by Muslims to be the literal word of God (Allah), as revealed to the Prophet Muhammad over a period of 23 years. It is regarded as the final and most complete revelation from God, following earlier scriptures like the Torah and the Bible.</p>
+            <p>It provides guidance on faith, worship, and conduct, addressing theological, moral, and legal matters. The Quran emphasizes monotheism, justice, and personal spirituality, making it the cornerstone of Islamic life and a source of peace for millions worldwide.</p>
+        </div>
+    </div>
+
+    <div class="main-app-content">
+        <h2>Explore Our Features</h2>
+        <p>Discover tools to enhance your Quranic journey, including Surah readings, Tafsir explanations, Tafsir audio narrations, Hifz tracking, Qibla direction, Prayer Time schedules, and offline access.</p>
+    </div>
+
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="surahs.html" aria-label="Surah">Surah</a></li>
+                    <li><a href="tafser.html" aria-label="Tafsir">Tafsir</a></li>
+                    <li><a href="tafseer Audio.html" aria-label="Tafsir Audio">Tafsir Audio</a></li>
+                    <li><a href="donate.html" aria-label="Donate">Donate</a></li>
+                    <li><a href="qibla.html" aria-label="Qibla">Qibla</a></li>
+                    <li><a href="ptime.html" aria-label="Prayer Time">Prayer Time</a></li>
+                    <li><a href="Hifz.html" aria-label="Hifz">Hifz</a></li>
+                    <li><a href="Tasbih.html" aria-label="Tasbeeh">Tasbeeh</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Feedback</h3>
+                <form action="https://formspree.io/f/manyyrbr" method="post">
+                    <label for="feedback-name">Name:</label>
+                    <input type="text" id="feedback-name" name="name" placeholder="Your Name" required>
+                    <label for="feedback-message">Message:</label>
+                    <textarea id="feedback-message" name="message" placeholder="Your Feedback" rows="3" required></textarea>
+                    <button type="submit">Send Feedback</button>
+                </form>
+            </div>
+            <div class="footer-section social-links">
+                <h3>Connect With Us</h3>
+                <div class="social-icons">
+                    <a href="https://facebook.com" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="https://twitter.com" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://instagram.com" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://youtube.com" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+        <p>&copy; 2025 knowquran. All rights reserved.</p>
+    </footer>
+
+    <button class="chat-btn" onclick="toggleChat()" aria-label="WhatsApp Chat"><i class="fab fa-whatsapp"></i></button>
+    <div class="whatsapp-links" id="whatsapp-links">
+        <a href="https://wa.me/1234567890" aria-label="Chat Support"><i class="fab fa-whatsapp"></i> Chat Support</a>
+    </div>
+
+    <button class="back-to-top" id="back-to-top" aria-label="Back to Top"><i class="fas fa-arrow-up"></i></button>
+
+    <script>
+        function toggleMenu() {
+            const menu = document.getElementById('navbar-menu');
+            menu.classList.toggle('active');
+        }
+
+        function toggleChat() {
+            const chatLinks = document.getElementById('whatsapp-links');
+            chatLinks.style.display = chatLinks.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.querySelector('.theme-toggle i');
+            themeIcon.classList.toggle('fa-moon');
+            themeIcon.classList.toggle('fa-sun');
+        }
+
+        function toggleMode() {
+            const modeToggle = document.getElementById('mode-toggle');
+            if (modeToggle.textContent === 'Online Mode') {
+                modeToggle.textContent = 'Offline Mode';
+                // Add logic for offline mode (e.g., enable offline features)
+                alert('Switched to Offline Mode. Some features may be limited.');
+            } else {
+                modeToggle.textContent = 'Online Mode';
+                // Add logic for online mode (e.g., enable online features)
+                alert('Switched to Online Mode. All features are available.');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            const loadingScreen = document.getElementById('loading-screen');
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 2000);
+        });
+
+        // Back to Top Button Functionality
+        const backToTopButton = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                backToTopButton.classList.add('visible');
+            } else {
+                backToTopButton.classList.remove('visible');
+            }
+        });
+
+        backToTopButton.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>

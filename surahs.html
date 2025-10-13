@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quran Viewer</title>
+<link rel="icon" href="images/quran.png" type="image/png">
+<!-- Google Fonts & Font Awesome -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Tajawal:wght@400;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+  :root {
+    /* Color Palette */
+    --clr-bg-dark: #0f172a;
+    --clr-card-bg: rgba(255,255,255,0.05);
+    --clr-border-light: rgba(255, 255, 255, 0.2);
+    --clr-accent: #facc15;
+    --clr-accent-hover: #eab308;
+    --clr-text-primary: #f1f5f9;
+    --clr-text-secondary: #94a3b8;
+    --clr-hover-surah: rgba(250,204,21,0.2);
+
+    /* Fonts */
+    --ff-primary: 'Poppins', sans-serif;
+    --ff-quran-arabic: 'Tajawal', sans-serif; /* Or 'Amiri', for a more traditional look */
+    --fs-quran-arabic: 1.8rem;
+    --fs-base: 1rem;
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 1.2rem;
+    --space-lg: 2rem;
+
+    /* Border Radius */
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-full: 50%;
+
+    /* Transitions */
+    --transition-ease: all 0.3s ease;
+  }
+
+  /* Base Styles */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--ff-primary);
+    background-color: var(--clr-bg-dark);
+    color: var(--clr-text-primary);
+    line-height: 1.7;
+  }
+
+  /* Utility Classes */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-lg) var(--space-sm) 4rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  /* Headings */
+  .main-heading {
+    font-size: 2rem;
+    color: var(--clr-accent);
+    margin-bottom: var(--space-lg);
+  }
+
+  .sub-heading {
+    color: var(--clr-accent);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+    font-size: 1.5rem; /* Adjusted for better hierarchy */
+  }
+
+  /* Buttons */
+  .btn {
+    padding: 0.6rem 1rem;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-ease);
+    background-color: var(--clr-card-bg);
+    color: var(--clr-text-primary);
+    display: inline-flex; /* For icon alignment */
+    align-items: center;
+    gap: 0.5rem; /* Space between icon and text */
+  }
+
+  .btn:hover {
+    background-color: var(--clr-accent);
+    color: var(--clr-bg-dark);
+    transform: translateY(-2px);
+  }
+
+  .btn-group {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-sm);
+  }
+
+  .tab-buttons {
+    display: flex;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-sm);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 0.6rem;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    border: none;
+    cursor: pointer;
+    transition: var(--transition-ease);
+    background-color: var(--clr-card-bg);
+    color: var(--clr-text-primary);
+  }
+
+  .tab-btn.active {
+    background-color: var(--clr-accent);
+    color: var(--clr-bg-dark);
+  }
+
+  /* List Items */
+  .list-wrapper {
+    list-style: none;
+  }
+
+  .list-item {
+    background-color: var(--clr-card-bg);
+    margin-bottom: var(--space-xs);
+    padding: 0.75rem var(--space-sm);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    transition: var(--transition-ease);
+  }
+
+  .list-item:hover {
+    background-color: var(--clr-hover-surah);
+    transform: translateY(-3px);
+  }
+
+  .list-item-link {
+    color: var(--clr-text-primary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    width: 100%; /* Make the entire item clickable */
+  }
+
+  .list-item-number {
+    background-color: var(--clr-accent);
+    color: var(--clr-bg-dark);
+    border-radius: var(--radius-full);
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--space-sm);
+    font-weight: 700;
+    flex-shrink: 0; /* Prevent number from shrinking on small screens */
+  }
+
+  /* Ayah Card */
+  .ayah-card {
+    background-color: var(--clr-card-bg);
+    padding: var(--space-md);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+  }
+
+  .ayah-header {
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+    color: var(--clr-accent);
+  }
+
+  .ayah-text-arabic {
+    text-align: right;
+    font-size: var(--fs-quran-arabic);
+    font-family: var(--ff-quran-arabic);
+    margin-bottom: var(--space-xs);
+    line-height: 2; /* Improved readability for Arabic text */
+  }
+
+  .ayah-text-translation {
+    font-size: var(--fs-base);
+    color: var(--clr-text-secondary);
+  }
+
+  /* Search Input */
+  .search-input-group {
+    margin-bottom: var(--space-sm);
+    position: relative;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.5rem; /* Left padding for icon */
+    border-radius: var(--radius-md);
+    border: none;
+    background-color: var(--clr-card-bg);
+    color: var(--clr-text-primary);
+    font-size: var(--fs-base);
+  }
+
+  .search-input::placeholder {
+    color: var(--clr-text-secondary);
+  }
+
+  .search-input-icon {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: var(--clr-text-secondary);
+  }
+
+  /* Loader */
+  .loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--clr-border-light);
+    border-top-color: var(--clr-accent);
+    border-radius: var(--radius-full);
+    animation: spin 1s linear infinite;
+    margin: var(--space-lg) auto;
+    display: none; /* Hidden by default */
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Responsive Adjustments */
+  @media (max-width: 600px) {
+    .ayah-text-arabic {
+      font-size: 1.5rem;
+    }
+    .container {
+      padding: var(--space-sm);
+    }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1 class="main-heading text-center">Quran Viewer</h1>
+
+  <div class="btn-group">
+    <button id="backBtn" class="btn"><i class="fas fa-arrow-left"></i> Back</button>
+    <button id="closeBtn" class="btn"><i class="fas fa-times"></i> Close</button>
+  </div>
+
+  <div class="tab-buttons">
+    <button id="showSurahBtn" class="tab-btn active">Surah</button>
+    <button id="showJuzBtn" class="tab-btn">Juz'</button>
+  </div>
+
+  <div class="search-input-group">
+    <i class="fas fa-search search-input-icon"></i>
+    <input type="text" id="surahSearchInput" class="search-input" placeholder="Search Surah by name or number">
+  </div>
+
+  <div id="loader" class="loader"></div>
+  <div id="quranContent"></div>
+</div>
+
+<script>
+const API_BASE_URL = 'https://api.alquran.cloud/v1';
+const QURAN_COM_TRANSLATION_URL = 'https://api.quran.com/api/v4/quran/translations/131'; // Malay translation ID
+
+const quranContentDiv = document.getElementById('quranContent');
+const backButton = document.getElementById('backBtn');
+const closeButton = document.getElementById('closeBtn');
+const surahSearchInput = document.getElementById('surahSearchInput');
+const showSurahTabBtn = document.getElementById('showSurahBtn');
+const showJuzTabBtn = document.getElementById('showJuzBtn');
+const loaderElement = document.getElementById('loader');
+
+let allSurahs = [];
+let currentView = 'surah'; // Tracks whether 'surah' or 'juz' tab is active
+
+// --- UI Utility Functions ---
+function showLoader(show) {
+  loaderElement.style.display = show ? 'block' : 'none';
+}
+
+function setActiveTab(tabId) {
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+// --- Navigation Handlers ---
+backButton.addEventListener('click', () => {
+  location.hash = ''; // Clears hash to return to main list
+});
+
+closeButton.addEventListener('click', () => {
+  window.location.href = 'Qruan.html'; // Assuming a dashboard exists
+});
+
+// --- API Calls ---
+async function fetchAllSurahs() {
+  if (allSurahs.length === 0) {
+    const response = await fetch(`${API_BASE_URL}/surah`);
+    const data = await response.json();
+    allSurahs = data.data;
+  }
+  return allSurahs;
+}
+
+async function fetchSurahData(surahNumber) {
+  const [quranResponse, malayResponse] = await Promise.all([
+    fetch(`${API_BASE_URL}/surah/${surahNumber}`),
+    fetch(`${QURAN_COM_TRANSLATION_URL}?chapter_number=${surahNumber}`)
+  ]);
+  const quranData = await quranResponse.json();
+  const malayData = await malayResponse.json();
+  return { quran: quranData.data, malay: malayData.translations };
+}
+
+async function fetchJuzData(juzNumber) {
+  const response = await fetch(`${API_BASE_URL}/juz/${juzNumber}/quran-uthmani`);
+  const data = await response.json();
+  return data.data;
+}
+
+// --- Rendering Functions ---
+function renderSurahList(surahsToRender) {
+  let html = '<ul class="list-wrapper">';
+  surahsToRender.forEach(s => {
+    html += `<li class="list-item">
+                <a href="#surah-${s.number}" class="list-item-link">
+                  <span class="list-item-number">${s.number}</span>
+                  <span>${s.englishName} (${s.name})</span>
+                </a>
+              </li>`;
+  });
+  html += '</ul>';
+  quranContentDiv.innerHTML = html;
+  surahSearchInput.style.display = 'block'; // Show search when on surah list
+}
+
+function renderSingleSurah(surahData, malayTranslations) {
+  let html = `<h2 class="sub-heading text-center">${surahData.englishName} (${surahData.name})</h2>`;
+  surahData.ayahs.forEach((ayah, idx) => {
+    // Find corresponding Malay translation using index
+    const malayText = malayTranslations[idx]?.text || 'Translation not available.';
+    html += `<div class="ayah-card">
+               <div class="ayah-header">Ayah ${ayah.numberInSurah}</div>
+               <div class="ayah-text-arabic">${ayah.text}</div>
+               <div class="ayah-text-translation">${malayText}</div>
+             </div>`;
+  });
+  quranContentDiv.innerHTML = html;
+  surahSearchInput.style.display = 'none'; // Hide search when viewing a single surah
+}
+
+async function renderJuzList() {
+  showLoader(true);
+  currentView = 'juz';
+  setActiveTab('showJuzBtn');
+  surahSearchInput.style.display = 'none'; // Hide search when viewing juz list
+  let html = '<ul class="list-wrapper">';
+  for (let i = 1; i <= 30; i++) {
+    html += `<li class="list-item">
+                <a href="#juz-${i}" class="list-item-link">
+                  <span class="list-item-number">${i}</span>
+                  <span>Juz' ${i}</span>
+                </a>
+              </li>`;
+  }
+  html += '</ul>';
+  quranContentDiv.innerHTML = html;
+  showLoader(false);
+}
+
+async function renderSingleJuz(juzData) {
+  showLoader(true);
+  let html = `<h2 class="sub-heading text-center">Juz' ${juzData.juz}</h2>`;
+  surahSearchInput.style.display = 'none'; // Hide search when viewing a single juz
+
+  // Fetch all surah translations needed for this Juz
+  const surahNumbersInJuz = [...new Set(juzData.ayahs.map(a => a.surah.number))];
+  const translationPromises = surahNumbersInJuz.map(num =>
+    fetch(`${QURAN_COM_TRANSLATION_URL}?chapter_number=${num}`).then(res => res.json())
+  );
+  const translationsData = await Promise.all(translationPromises);
+
+  const translationMap = {};
+  translationsData.forEach(data => {
+    data.translations.forEach(tr => {
+      translationMap[tr.verse_key] = tr.text;
+    });
+  });
+
+  let currentSurahName = null;
+  juzData.ayahs.forEach(ayah => {
+    if (currentSurahName !== ayah.surah.name) {
+      currentSurahName = ayah.surah.name;
+      html += `<h3 class="sub-heading">${ayah.surah.englishName} (${currentSurahName})</h3>`; // Sub-heading for surah within juz
+    }
+    const malayText = translationMap[ayah.verseKey] || 'Translation not available.';
+    html += `<div class="ayah-card">
+               <div class="ayah-header">Ayah ${ayah.numberInSurah}</div>
+               <div class="ayah-text-arabic">${ayah.text}</div>
+               <div class="ayah-text-translation">${malayText}</div>
+             </div>`;
+  });
+  quranContentDiv.innerHTML = html;
+  showLoader(false);
+}
+
+// --- Event Listeners & Router ---
+surahSearchInput.addEventListener('input', () => {
+  const query = surahSearchInput.value.toLowerCase().trim();
+  const filteredSurahs = allSurahs.filter(s =>
+    s.name.toLowerCase().includes(query) ||
+    s.englishName.toLowerCase().includes(query) ||
+    s.number.toString().startsWith(query)
+  );
+  renderSurahList(filteredSurahs);
+});
+
+showSurahTabBtn.addEventListener('click', () => {
+  currentView = 'surah';
+  setActiveTab('showSurahBtn');
+  location.hash = ''; // Clear hash to show full surah list
+});
+
+showJuzTabBtn.addEventListener('click', () => {
+  currentView = 'juz';
+  setActiveTab('showJuzBtn');
+  renderJuzList(); // Immediately render juz list
+});
+
+async function router() {
+  const hash = location.hash;
+  showLoader(true); // Show loader for all hash changes initially
+  quranContentDiv.innerHTML = ''; // Clear previous content
+
+  try {
+    if (!hash) {
+      currentView = 'surah';
+      setActiveTab('showSurahBtn');
+      const surahs = await fetchAllSurahs();
+      renderSurahList(surahs);
+    } else if (hash.startsWith('#surah-')) {
+      const surahNumber = hash.split('-')[1];
+      const { quran, malay } = await fetchSurahData(surahNumber);
+      renderSingleSurah(quran, malay);
+    } else if (hash.startsWith('#juz-')) {
+      const juzNumber = hash.split('-')[1];
+      const juzData = await fetchJuzData(juzNumber);
+      await renderSingleJuz(juzData); // Await rendering of Juz to ensure translations are fetched
+      setActiveTab('showJuzBtn'); // Ensure Juz tab is active even if navigated via URL
+    } else {
+      // Fallback for invalid hash
+      currentView = 'surah';
+      setActiveTab('showSurahBtn');
+      const surahs = await fetchAllSurahs();
+      renderSurahList(surahs);
+    }
+  } catch (error) {
+    console.error("Failed to load content:", error);
+    quranContentDiv.innerHTML = '<p>Error loading content. Please try again.</p>';
+  } finally {
+    showLoader(false);
+  }
+}
+
+// Initial load and hash change listener
+window.addEventListener('hashchange', router);
+router(); // Call router on initial page load
+</script>
+</body>
+</html>

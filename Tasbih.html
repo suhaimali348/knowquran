@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Tasbih Counter</title>
+  <link rel="icon" href="images/quran.png" type="image/png" />
+  <style>
+    :root {
+      --primary-color: #5e35b1;
+      --accent-gradient-1: #8e2de2;
+      --accent-gradient-2: #4a00e0;
+      --warning-gradient-1: #ff416c;
+      --warning-gradient-2: #ff4b2b;
+      --bg-light: #f5f5fa;
+      --bg-shadow-light: rgba(255,255,255,0.7);
+      --bg-shadow-dark: rgba(0,0,0,0.1);
+      --text-color: #333;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0c3fc, #8ec5fc, #8ed2fc, #e0c3fc);
+      background-size: 400% 400%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      position: relative;
+      background: var(--bg-light);
+      padding: 40px;
+      border-radius: 30px;
+      box-shadow: 10px 10px 30px var(--bg-shadow-dark), -10px -10px 30px var(--bg-shadow-light);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      width: 90%;
+      max-width: 400px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+
+    .container.loaded {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .dashboard-btn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #e6e6ef, #ffffff);
+      box-shadow: 4px 4px 8px #d4d4dd, -4px -4px 8px #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-color);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .dashboard-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 6px 6px 12px #d4d4dd, -6px -6px 12px #ffffff;
+    }
+
+    .counter-display {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .counter-circle {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #e6e6ef, #ffffff);
+      box-shadow: inset 10px 10px 25px #d4d4dd, inset -10px -10px 25px #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 64px;
+      font-weight: bold;
+      color: var(--primary-color);
+      transition: transform 0.2s ease;
+      z-index: 2;
+    }
+
+    .counter-progress {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 200px;
+      transform: rotate(-90deg);
+      z-index: 1;
+    }
+
+    .progress-ring { fill: none; stroke-width: 10; transition: stroke-dashoffset 0.5s ease; }
+    .progress-ring-bg { stroke: #e6e6ef; }
+    .progress-ring-fg { stroke: url(#progress-gradient); stroke-linecap: round; }
+    .counter-circle.animate-pop { animation: pop 0.3s ease; }
+    .counter-circle.animate-pulse { animation: pulse 1.5s infinite ease-in-out; }
+
+    @keyframes pop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: inset 10px 10px 25px #d4d4dd, inset -10px -10px 25px #ffffff, 0 0 0 0 rgba(142, 45, 226, 0.4); }
+      70% { box-shadow: inset 10px 10px 25px #d4d4dd, inset -10px -10px 25px #ffffff, 0 0 0 20px rgba(142, 45, 226, 0); }
+      100% { box-shadow: inset 10px 10px 25px #d4d4dd, inset -10px -10px 25px #ffffff, 0 0 0 0 rgba(142, 45, 226, 0); }
+    }
+
+    .buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+    button { padding: 16px 24px; font-size: 18px; border: none; border-radius: 40px; cursor: pointer; color: white; font-weight: 600; transition: all 0.3s ease; box-shadow: 4px 4px 12px var(--bg-shadow-dark), -4px -4px 12px var(--bg-shadow-light); min-width: 110px; text-align: center; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: 4px 4px 12px var(--bg-shadow-dark), -4px -4px 12px var(--bg-shadow-light) !important; }
+    .count-btn { background: linear-gradient(to right, var(--accent-gradient-1), var(--accent-gradient-2)); }
+    .auto-btn { background: linear-gradient(to right, #11998e, #38ef7d); }
+    .auto-btn.stop { background: linear-gradient(to right, #ff9966, #ff5e62); }
+    .save-btn { background: linear-gradient(to right, #00c6ff, #0072ff); }
+    .save-btn.saved { background: linear-gradient(to right, #11998e, #38ef7d); transform: scale(1.05); }
+    .reset-btn { background: linear-gradient(to right, var(--warning-gradient-1), var(--warning-gradient-2)); }
+    button:not(:disabled):hover { transform: translateY(-3px); box-shadow: 6px 6px 16px rgba(0,0,0,0.2), -6px -6px 16px rgba(255,255,255,0.4); }
+    button:not(:disabled):active { transform: translateY(1px); box-shadow: 2px 2px 8px rgba(0,0,0,0.2), -2px -2px 8px rgba(255,255,255,0.4); }
+    .label { font-size: 16px; color: var(--text-color); background: rgba(255,255,255,0.4); padding: 5px 15px; border-radius: 20px; }
+    
+    @media (max-width: 480px) {
+      .container { padding: 25px; gap: 25px; }
+      .counter-display { width: 160px; height: 160px; }
+      .counter-circle { width: 145px; height: 145px; font-size: 52px; }
+      .counter-progress { width: 160px; height: 160px; }
+      .progress-ring { stroke-width: 8; }
+      .buttons { gap: 10px; }
+      button { padding: 14px 20px; font-size: 16px; min-width: 100px;}
+      .dashboard-btn { width: 35px; height: 35px; top: 15px; left: 15px; }
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0">
+    <defs><linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#8e2de2;stop-opacity:1" /><stop offset="100%" style="stop-color:#4a00e0;stop-opacity:1" /></linearGradient></defs>
+  </svg>
+
+  <div class="container" id="container">
+    <a href="Qruan.html" class="dashboard-btn" aria-label="Close and go to Dashboard">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+        <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+      </svg>
+    </a>
+
+    <div class="counter-display">
+      <svg class="counter-progress"><circle class="progress-ring progress-ring-bg" cx="100" cy="100" r="95"></circle><circle id="progress-ring" class="progress-ring progress-ring-fg" cx="100" cy="100" r="95"></circle></svg>
+      <div class="counter-circle" id="counter-text">0</div>
+    </div>
+
+    <div class="buttons">
+      <button class="count-btn" id="tap-btn" onclick="manualIncrement()">Tap</button>
+      <button class="auto-btn" id="auto-btn" onclick="toggleAutoCount()">Auto</button>
+      <button class="save-btn" id="save-btn" onclick="saveCount()">Save</button>
+      <button class="reset-btn" id="reset-btn" onclick="resetCounter()">Reset</button>
+    </div>
+
+    <div class="label">Max: 33 counts</div>
+  </div>
+
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('Service Worker registered with scope:', registration.scope);
+          })
+          .catch(error => {
+            console.error('Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    const container = document.getElementById('container');
+    const counterText = document.getElementById('counter-text');
+    const tapBtn = document.getElementById('tap-btn');
+    const autoBtn = document.getElementById('auto-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const progressRing = document.getElementById('progress-ring');
+    const MAX_COUNT = 33;
+    const AUTO_INTERVAL_MS = 1000;
+    const STORAGE_KEY = 'tasbihCounterValue';
+    let count = 0;
+    let autoCountInterval = null;
+    let isAutoCounting = false;
+    const radius = progressRing.r.baseVal.value;
+    const circumference = 2 * Math.PI * radius;
+    progressRing.style.strokeDasharray = `${circumference} ${circumference}`;
+    function setProgress(percent) { const offset = circumference - (percent / 100) * circumference; progressRing.style.strokeDashoffset = offset; }
+    function updateUI() { counterText.textContent = count; const progressPercent = (count / MAX_COUNT) * 100; setProgress(progressPercent); }
+    function animateCounter() { counterText.classList.remove('animate-pop'); void counterText.offsetWidth; counterText.classList.add('animate-pop'); }
+    function manualIncrement() { if (count < MAX_COUNT) { count++; updateUI(); animateCounter(); } }
+    function toggleAutoCount() { isAutoCounting = !isAutoCounting; if (isAutoCounting) { autoBtn.textContent = 'Stop'; autoBtn.classList.add('stop'); tapBtn.disabled = true; counterText.classList.add('animate-pulse'); autoCountInterval = setInterval(() => { if (count < MAX_COUNT) { count++; updateUI(); } else { toggleAutoCount(); } }, AUTO_INTERVAL_MS); } else { clearInterval(autoCountInterval); autoBtn.textContent = 'Auto'; autoBtn.classList.remove('stop'); tapBtn.disabled = false; counterText.classList.remove('animate-pulse'); } }
+    function resetCounter() { count = 0; localStorage.removeItem(STORAGE_KEY); updateUI(); animateCounter(); if (isAutoCounting) { toggleAutoCount(); } }
+    function saveCount() { localStorage.setItem(STORAGE_KEY, count); saveBtn.textContent = 'Saved!'; saveBtn.classList.add('saved'); saveBtn.disabled = true; setTimeout(() => { saveBtn.textContent = 'Save'; saveBtn.classList.remove('saved'); saveBtn.disabled = false; }, 1500); }
+    function loadSavedCount() { const savedCount = localStorage.getItem(STORAGE_KEY); if (savedCount !== null && !isNaN(savedCount)) { count = parseInt(savedCount, 10); } }
+    window.onload = () => { loadSavedCount(); updateUI(); progressRing.style.strokeDashoffset = circumference - ( (count/MAX_COUNT) / 100) * circumference; container.classList.add('loaded'); };
+  </script>
+</body>
+</html>

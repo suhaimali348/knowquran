@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qibla Finder - Coming Soon</title>
+  <link rel="icon" href="images/quran.png" type="image/png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0f172a;
+      color: #f9fafb;
+      overflow: hidden;
+      background-image: radial-gradient(circle at top right, rgba(45,212,191,0.1), transparent 60%), 
+                        radial-gradient(circle at bottom left, rgba(45,212,191,0.08), transparent 70%);
+    }
+
+    .pattern-bg {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 100 100'%3E%3Cg fill='%232dd4bf' fill-opacity='0.05'%3E%3Cpath d='M50 0L61 30H89L67 48l9 30-26-18L24 78l9-30L11 30h28z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100px 100px;
+    }
+
+    .card-container {
+      background: rgba(31, 41, 55, 0.6);
+      backdrop-filter: blur(25px);
+      border: 1px solid rgba(75, 85, 99, 0.4);
+      animation: fadeIn 1s ease-in-out, pulseGlow 4s ease-in-out infinite;
+      box-shadow: 0 0 40px rgba(20, 184, 166, 0.15);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 20px rgba(20, 184, 166, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(20, 184, 166, 0.6); }
+    }
+
+    .icon-bounce {
+      animation: iconBounce 2.5s ease-in-out infinite;
+    }
+
+    @keyframes iconBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .close-btn {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      width: 50px;
+      height: 50px;
+      background: rgba(31, 41, 55, 0.5);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(75, 85, 99, 0.5);
+      color: #F9FAFB;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      text-decoration: none;
+      font-size: 1.5rem;
+      transition: all 0.3s ease;
+      z-index: 50;
+    }
+
+    .close-btn:hover {
+      background: rgba(45, 212, 191, 0.2);
+      color: #2dd4bf;
+      transform: scale(1.1) rotate(90deg);
+      box-shadow: 0 8px 25px rgba(20, 184, 166, 0.3);
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen pattern-bg p-4">
+
+  <!-- Floating Close Button -->
+  <a href="Qruan.html" class="close-btn" aria-label="Go Back">
+    <i class="fas fa-times"></i>
+  </a>
+
+  <!-- Main Coming Soon Card -->
+  <main class="card-container w-full max-w-lg mx-auto rounded-3xl p-12 md:p-16 text-center">
+    <div class="mb-8">
+      <i class="fas fa-kaaba text-6xl md:text-7xl text-teal-400 icon-bounce"></i>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">Qibla Finder</h1>
+    <p class="text-teal-400 text-2xl md:text-3xl font-semibold mt-4">Coming Soon</p>
+  </main>
+
+</body>
+</html>
