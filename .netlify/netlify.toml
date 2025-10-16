@@ -1,0 +1,30 @@
+functionsDirectory = "D:\\quran\\netlify\\functions"
+functionsDirectoryOrigin = "config-v1"
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "D:\\quran"
+publishOrigin = "default"
+commandOrigin = "config"
+command = "# no build command"
+functions = "D:\\quran\\netlify\\functions"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]
