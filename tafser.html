@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Holy Quran - Reader</title>
+<link rel="icon" href="images/quran.png">
+<link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+    --bg-main: #f4f7f6;
+    --bg-content: #ffffff;
+    --primary-accent: #2c6779;
+    --secondary-accent: #b0d8c3;
+    --text-dark: #333333;
+    --text-light: #6c757d;
+    --border-color: #e9ecef;
+    --shadow-color: rgba(44, 103, 121, 0.1);
+    --danger-color: #e74c3c;
+    --danger-hover: #c0392b;
+}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif;}
+body {background-color: var(--bg-main); color: var(--text-dark); -webkit-font-smoothing: antialiased;}
+#loader {position:fixed; top:0; left:0; width:100%; height:100%; background: rgba(255,255,255,0.8); display:flex; justify-content:center; align-items:center; z-index:1000;}
+.spinner {width:50px; height:50px; border:5px solid var(--secondary-accent); border-top-color: var(--primary-accent); border-radius:50%; animation: spin 1s linear infinite;}
+@keyframes spin {to{transform:rotate(360deg);}}
+.view {display:none; padding:20px; max-width:1200px; margin:0 auto;}
+.view.active {display:block;}
+#main-menu h1{text-align:center; font-family:'Amiri Quran', serif; font-size:3rem; color: var(--primary-accent); margin-bottom:30px;}
+.controls{display:flex; justify-content:center; align-items:center; gap:20px; flex-wrap:wrap; margin-bottom:40px;}
+.search-container{position:relative; display:flex; align-items:center; flex-grow:1; max-width:400px;}
+.search-container .fa-search{position:absolute; left:15px; color: var(--text-light);}
+.search-container input{width:100%; padding:12px 12px 12px 40px; border:1px solid var(--border-color); border-radius:8px; font-size:1rem; background-color: var(--bg-content);}
+.custom-select-container{position:relative; min-width:280px; flex-grow:1; max-width:400px;}
+.custom-select-trigger{display:flex; justify-content:space-between; align-items:center; padding:12px; border:1px solid var(--border-color); border-radius:8px; font-size:1rem; background-color: var(--bg-content); cursor:pointer; transition:border-color 0.2s;}
+.custom-select-trigger:hover, .custom-select-container.open .custom-select-trigger{border-color: var(--primary-accent);}
+.custom-select-trigger .arrow{transition: transform 0.3s ease;}
+.custom-select-container.open .arrow{transform:rotate(180deg);}
+.custom-select-options{position:absolute; top:110%; left:0; right:0; background: var(--bg-content); border:1px solid var(--border-color); border-radius:8px; box-shadow:0 10px 25px var(--shadow-color); z-index:10; max-height:250px; overflow-y:auto; opacity:0; visibility:hidden; transform:translateY(-10px); transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;}
+.custom-select-container.open .custom-select-options{opacity:1; visibility:visible; transform:translateY(0);}
+.custom-select-option{padding:12px 15px; cursor:pointer; transition: background-color 0.2s; font-size:0.95rem;}
+.custom-select-option:hover{background-color: var(--bg-main);}
+.custom-select-option.selected{background-color: var(--secondary-accent); color: var(--primary-accent); font-weight:600;}
+#exit-button{padding:12px 20px; background-color:var(--danger-color); color:white; border:none; border-radius:8px; font-weight:600; font-size:1rem; cursor:pointer; display:flex; align-items:center; gap:8px; text-decoration:none;}
+#exit-button:hover{background-color: var(--danger-hover);}
+#surah-list{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px;}
+.surah-card{background-color:var(--bg-content); border-radius:12px; padding:20px; box-shadow:0 4px 20px var(--shadow-color); cursor:pointer; display:flex; align-items:center; justify-content:space-between; border:1px solid var(--border-color); opacity:0; animation:fadeIn 0.5s ease-out forwards;}
+.surah-card:hover{transform:translateY(-5px); box-shadow:0 8px 25px rgba(44,103,121,0.15);}
+.surah-info{display:flex; align-items:center;}
+.surah-number{background-color: var(--secondary-accent); color: var(--primary-accent); font-weight:600; width:40px; height:40px; border-radius:50%; display:grid; place-items:center; margin-right:15px; flex-shrink:0;}
+.surah-name h3{font-size:1.1rem; font-weight:600;}
+.surah-name p{font-size:0.9rem; color: var(--text-light);}
+.surah-arabic-name{font-family:'Amiri Quran', serif; font-size:1.5rem; color: var(--primary-accent);}
+#reading-view .header{display:flex; align-items:center; justify-content:space-between; padding:15px 20px; background-color: var(--bg-content); border-radius:12px; box-shadow:0 4px 20px var(--shadow-color); margin-bottom:30px; flex-wrap:wrap; gap:15px;}
+#back-button{background:none; border:none; font-size:1rem; color: var(--primary-accent); cursor:pointer; padding:10px; display:flex; align-items:center; gap:8px; font-weight:600;}
+#surah-title{text-align:right;}
+#surah-title h2{font-weight:600;}
+#surah-title p{color: var(--text-light); font-size:0.9rem;}
+.translation-toggle{display:flex; align-items:center; gap:10px; font-size:0.9rem; color: var(--text-dark); margin-left:auto;}
+.switch{position:relative; display:inline-block; width:44px; height:24px;}
+.switch input{opacity:0; width:0; height:0;}
+.slider{position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius:24px;}
+.slider:before{position:absolute; content:""; height:18px; width:18px; left:3px; bottom:3px; background-color:white; transition:.4s; border-radius:50%;}
+input:checked + .slider{background-color: var(--primary-accent);}
+input:checked + .slider:before{transform:translateX(20px);}
+#verse-container{max-width:800px; margin:0 auto;}
+#verse-container.hide-translation .translation-text{display:none;}
+.verse-card{background-color: var(--bg-content); border-radius:12px; padding:25px; margin-bottom:20px; border:1px solid var(--border-color); opacity:0; transform:translateY(20px); animation:fadeIn 0.6s ease-out forwards;}
+.verse-card.bismillah{text-align:center; padding:20px;}
+.verse-header{color: var(--primary-accent); font-weight:600; margin-bottom:15px; padding-bottom:10px; border-bottom:1px solid var(--border-color);}
+.arabic-text{font-family:'Amiri Quran', serif; font-size:2rem; line-height:2.2; text-align:right; direction:rtl; margin-bottom:20px;}
+.translation-text{line-height:1.8; font-size:1.1rem; transition:all 0.3s ease;}
+@keyframes fadeIn{to{opacity:1; transform:translateY(0);}}
+.hidden{display:none !important;}
+@media (max-width:768px){
+#main-menu h1{font-size:2.5rem;}
+.controls{flex-direction:column; align-items:stretch;}
+.search-container, .custom-select-container{max-width:100%;}
+#surah-list{grid-template-columns:1fr;}
+#reading-view .header{flex-direction:column; gap:15px; align-items:flex-start;}
+.translation-toggle{margin-left:0; width:100%; justify-content:space-between; padding:5px 0;}
+#surah-title{text-align:left;}
+.arabic-text{font-size:1.8rem;}
+.translation-text{font-size:1rem;}
+}
+</style>
+</head>
+<body>
+
+<div id="loader"><div class="spinner"></div></div>
+
+<div id="main-menu" class="view active">
+    <h1>The Holy Quran</h1>
+
+    <div class="controls">
+        <div class="search-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Search by Surah name or number...">
+        </div>
+        
+        <div class="custom-select-container" id="translation-select-container">
+            <div class="custom-select-trigger">
+                <span id="selected-translation-text">Select Translation</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </div>
+            <div class="custom-select-options" id="translation-options"></div>
+        </div>
+
+        <a href="quran.html" id="exit-button">
+            <i class="fas fa-home"></i> Back to Home
+        </a>
+    </div>
+
+    <div id="surah-list"></div>
+</div>
+
+<div id="reading-view" class="view">
+    <header class="header">
+        <button id="back-button"><i class="fas fa-arrow-left"></i> Back to List</button>
+        <div id="surah-title"></div>
+        <div class="translation-toggle">
+            <span>Translation</span>
+            <label class="switch">
+                <input type="checkbox" id="translation-toggle-checkbox" checked>
+                <span class="slider round"></span>
+            </label>
+        </div>
+    </header>
+    <main id="verse-container"></main>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const mainMenu = document.getElementById('main-menu');
+    const readingView = document.getElementById('reading-view');
+    const loader = document.getElementById('loader');
+    const surahListContainer = document.getElementById('surah-list');
+    const backButton = document.getElementById('back-button');
+    const surahTitleContainer = document.getElementById('surah-title');
+    const verseContainer = document.getElementById('verse-container');
+    const searchInput = document.getElementById('search-input');
+    const translationToggleCheckbox = document.getElementById('translation-toggle-checkbox');
+    
+    const selectContainer = document.getElementById('translation-select-container');
+    const selectTrigger = selectContainer.querySelector('.custom-select-trigger');
+    const selectedText = document.getElementById('selected-translation-text');
+    const optionsContainer = document.getElementById('translation-options');
+
+    const API_BASE_URL = 'https://api.alquran.cloud/v1';
+    let surahDataCache = null;
+    let translationsCache = [];
+    const DEFAULT_TRANSLATION = 'en.sahih';
+
+    const showLoader = () => loader.style.display='flex';
+    const hideLoader = () => loader.style.display='none';
+    const switchView = (view) => {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        view.classList.add('active');
+        window.scrollTo(0,0);
+    };
+
+    async function populateTranslations() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/edition?format=text&type=translation`);
+            const { data } = await response.json();
+            data.sort((a,b) => a.englishName.localeCompare(b.englishName));
+            translationsCache = data;
+            renderTranslationOptions(data, DEFAULT_TRANSLATION);
+        } catch (error) {
+            console.error("Error loading translations:", error);
+            selectedText.textContent = "Error loading translations.";
+        }
+    }
+
+    function renderTranslationOptions(translations, selectedValue){
+        optionsContainer.innerHTML = `<input type="text" id="translation-search" placeholder="Search translations..." style="width:100%; padding:8px 12px; border:none; border-bottom:1px solid #ccc; outline:none; font-size:0.95rem; margin-bottom:5px; border-radius:4px;">`;
+        const searchInputBox = optionsContainer.querySelector('#translation-search');
+        translations.forEach(edition=>{
+            const option = document.createElement('div');
+            option.className = 'custom-select-option';
+            option.textContent = `${edition.englishName} (${edition.language})`;
+            option.dataset.value = edition.identifier;
+            if(edition.identifier===selectedValue){
+                option.classList.add('selected');
+                selectedText.textContent = option.textContent;
+                selectContainer.dataset.value = edition.identifier;
+            }
+            option.addEventListener('click', ()=>{
+                selectedText.textContent = option.textContent;
+                selectContainer.dataset.value = option.dataset.value;
+                optionsContainer.querySelector('.selected')?.classList.remove('selected');
+                option.classList.add('selected');
+                selectContainer.classList.remove('open');
+            });
+            optionsContainer.appendChild(option);
+        });
+        searchInputBox.addEventListener('input', (e)=>{
+            const query = e.target.value.toLowerCase();
+            optionsContainer.querySelectorAll('.custom-select-option').forEach(opt=>{
+                opt.style.display = opt.textContent.toLowerCase().includes(query) ? 'block':'none';
+            });
+        });
+    }
+
+    selectTrigger.addEventListener('click', ()=> selectContainer.classList.toggle('open'));
+    window.addEventListener('click',(e)=>{if(!selectContainer.contains(e.target)) selectContainer.classList.remove('open');});
+
+    async function fetchSurahMetadata(){
+        if(surahDataCache) return;
+        try{
+            const res = await fetch(`${API_BASE_URL}/surah`);
+            const {data} = await res.json();
+            surahDataCache = data;
+        }catch(err){
+            console.error(err);
+            surahListContainer.innerHTML='<p style="text-align:center;">Could not load Surahs.</p>';
+        }
+    }
+
+    function renderSurahList(surahs){
+        surahListContainer.innerHTML='';
+        if(!surahs || surahs.length===0){surahListContainer.innerHTML='<p style="text-align:center;">No Surahs found.</p>'; return;}
+        surahs.forEach((surah,index)=>{
+            const card = document.createElement('div');
+            card.className='surah-card';
+            card.dataset.surahNumber=surah.number;
+            card.style.animationDelay=`${index*20}ms`;
+            card.innerHTML=`<div class="surah-info"><div class="surah-number">${surah.number}</div><div class="surah-name"><h3>${surah.englishName}</h3><p>${surah.englishNameTranslation}</p></div></div><div class="surah-arabic-name">${surah.name}</div>`;
+            card.addEventListener('click',()=> fetchAndDisplaySurah(surah.number));
+            surahListContainer.appendChild(card);
+        });
+    }
+
+    async function fetchAndDisplaySurah(surahNumber){
+        showLoader();
+        switchView(readingView);
+        const translationIdentifier = selectContainer.dataset.value || DEFAULT_TRANSLATION;
+        const editions = `quran-uthmani,${translationIdentifier}`;
+        try{
+            const res = await fetch(`${API_BASE_URL}/surah/${surahNumber}/editions/${editions}`);
+            const {data} = await res.json();
+            renderSurah(data[0], data[1]);
+        }catch(err){
+            console.error(err);
+            verseContainer.innerHTML='<p style="text-align:center;">Error loading Surah.</p>';
+        }finally{hideLoader();}
+    }
+
+    function renderSurah(arabicData, translationData){
+        surahTitleContainer.innerHTML=`<h2>${arabicData.englishName}</h2><p>${arabicData.revelationType} - ${arabicData.numberOfAyahs} Verses</p>`;
+        verseContainer.innerHTML='';
+        translationToggleCheckbox.checked=true;
+        verseContainer.classList.remove('hide-translation');
+        if(arabicData.number!==1 && arabicData.number!==9){
+            const bismillah = document.createElement('div');
+            bismillah.className='verse-card bismillah';
+            bismillah.innerHTML='<p class="arabic-text">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>';
+            verseContainer.appendChild(bismillah);
+        }
+        arabicData.ayahs.forEach((ayah,index)=>{
+            const verseCard=document.createElement('div');
+            verseCard.className='verse-card';
+            verseCard.style.animationDelay=`${index*50}ms`;
+            verseCard.innerHTML=`<div class="verse-header">Verse ${ayah.numberInSurah}</div><p class="arabic-text">${ayah.text}</p><p class="translation-text">${translationData.ayahs[index].text}</p>`;
+            verseContainer.appendChild(verseCard);
+        });
+    }
+
+    backButton.addEventListener('click', ()=>switchView(mainMenu));
+
+    searchInput.addEventListener('input',(e)=>{
+        const query = e.target.value.toLowerCase().trim();
+        if(!surahDataCache) return;
+        const filtered = surahDataCache.filter(surah=> surah.englishName.toLowerCase().includes(query) || surah.englishNameTranslation.toLowerCase().includes(query) || surah.number.toString().includes(query));
+        renderSurahList(filtered);
+    });
+
+    translationToggleCheckbox.addEventListener('change', e=> verseContainer.classList.toggle('hide-translation', !e.target.checked));
+
+    async function initializeApp(){
+        showLoader();
+        await populateTranslations();
+        await fetchSurahMetadata();
+        renderSurahList(surahDataCache);
+        hideLoader();
+    }
+
+    initializeApp();
+});
+</script>
+
+</body>
+</html>

@@ -763,13 +763,16 @@
             <div class="footer-section">
                 <h3>Quick Links</h3>
                 <ul>
+                    <li><a href="#home" aria-label="Home">Home</a></li>
+                    <li><a href="#about" aria-label="About">About</a></li>
+                    <li><a href="#contact" aria-label="Contact">Contact</a></li>
                     <li><a href="surahs.html" aria-label="Surah">Surah</a></li>
                     <li><a href="tafser.html" aria-label="Tafsir">Tafsir</a></li>
                     <li><a href="tafseer Audio.html" aria-label="Tafsir Audio">Tafsir Audio</a></li>
                     <li><a href="donate.html" aria-label="Donate">Donate</a></li>
                     <li><a href="qibla.html" aria-label="Qibla">Qibla</a></li>
                     <li><a href="ptime.html" aria-label="Prayer Time">Prayer Time</a></li>
-                    <li><a href="Hifz.html" aria-label="Hifz">Hifz</a></li>
+                    <li><a href="hifz.html" aria-label="Hifz">Hifz</a></li>
                     <li><a href="Tasbih.html" aria-label="Tasbeeh">Tasbeeh</a></li>
                 </ul>
             </div>
@@ -825,11 +828,9 @@
             const modeToggle = document.getElementById('mode-toggle');
             if (modeToggle.textContent === 'Online Mode') {
                 modeToggle.textContent = 'Offline Mode';
-                // Add logic for offline mode (e.g., enable offline features)
                 alert('Switched to Offline Mode. Some features may be limited.');
             } else {
                 modeToggle.textContent = 'Online Mode';
-                // Add logic for online mode (e.g., enable online features)
                 alert('Switched to Online Mode. All features are available.');
             }
         }
@@ -841,7 +842,6 @@
             }, 2000);
         });
 
-        // Back to Top Button Functionality
         const backToTopButton = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => {
             if (window.scrollY > 100) {
