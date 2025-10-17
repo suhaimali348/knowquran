@@ -8,7 +8,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Amiri:wght@700&display=swap" rel="stylesheet">
-  <style>
+ <link rel="icon" type="icon" href="images/quran.png">
+ <style>
     /* --- Simplified Color Palette --- */
     :root {
       --primary-accent: #28a745; /* Green */
@@ -92,7 +93,7 @@
 </head>
 <body class="antialiased">
   
-  <!-- MODIFIED: This link now points to Quran.html -->
+  <!-- MODIFIED: This link now points to dashboard.html -->
   <a href="quran.html" class="close-btn" title="Exit to Dashboard"><i class="fas fa-times"></i></a>
   
   <header class="sticky top-0 z-50 py-5">
@@ -121,31 +122,18 @@
   </main>
 
   <script>
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('Service Worker registered with scope:', registration.scope);
-          })
-          .catch(error => {
-            console.error('Service Worker registration failed:', error);
-          });
-      });
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       const surahData = [
         { "id": 1, "name": "Al-Fatiha", "nameArabic": "ٱلْفَاتِحَة", "nameEnglish": "The Opener", "revelationType": "Meccan", "numberOfAyahs": 7, "audioSrc": "udio/Q001 - Al Fattiha.mp3" },
         { "id": 2, "name": "Al-Baqarah", "nameArabic": "ٱلْبَقَرَة", "nameEnglish": "The Cow", "revelationType": "Medinan", "numberOfAyahs": 286, "audioSrc": "udio/Q002_1 - Al Baqarah (1).mp3" },
         { "id": 3, "name": "Aal-E-Imran", "nameArabic": "آلِ عِمْرَان", "nameEnglish": "Family of Imran", "revelationType": "Medinan", "numberOfAyahs": 200, "audioSrc": "udio/Q003 - Aal-Imran (2).mp3" },
         { "id": 4, "name": "An-Nisa", "nameArabic": "ٱلنِّسَاء", "nameEnglish": "The Women", "revelationType": "Medinan", "numberOfAyahs": 176, "audioSrc": "udio/Q004 - An-Nisa'.mp3" },
-        { "id": 5, "name": "Al-Ma'idah", "nameArabic": "ٱلْمَائِدَة", "nameEnglish": "The Table Spread", "revelationType": "Medinan", "numberOfAyahs": 120, "audioSrc": "udio/Q005 - Al Ma'eda.mp3" },
+        { "id": 5, "name": "Al-Ma'idah", "nameArabic": "ٱلْمَائِدَة", "nameEnglish": "The Table Spread", "revelationType": "Medinan", "numberOfAyahs": 120, "audioSrc": "udio/- Al Ma'eda.mp3" },
         { "id": 6, "name": "Al-An'am", "nameArabic": "ٱلْأَنْعَام", "nameEnglish": "The Cattle", "revelationType": "Meccan", "numberOfAyahs": 165, "audioSrc": "udio/Q006_Al_Anam (1).mp3" },
         { "id": 7, "name": "Al-A'raf", "nameArabic": "ٱلْأَعْرَاف", "nameEnglish": "The Heights", "revelationType": "Meccan", "numberOfAyahs": 206, "audioSrc": "udio/Q007 - Al A'raf (1).mp3" },
         { "id": 8, "name": "Al-Anfal", "nameArabic": "ٱلْأَنْفَال", "nameEnglish": "The Spoils of War", "revelationType": "Medinan", "numberOfAyahs": 75, "audioSrc": "udio/Q008 - Al Anfal (1).mp3" },
         { "id": 9, "name": "At-Tawbah", "nameArabic": "ٱلتَّوْبَة", "nameEnglish": "The Repentance", "revelationType": "Medinan", "numberOfAyahs": 129, "audioSrc": "udio/Q009 - At-Touba.mp3" },
-        { "id": 10, "name": "Yunus", "nameArabic": "يُونُس", "nameEnglish": "Jonah", "revelationType": "Meccan", "numberOfAyahs": 109, "audioSrc": "udio/Q010 - Yunus.mp3" },
+        { "id": 10, "name": "Yunus", "nameArabic": "يُونُс", "nameEnglish": "Jonah", "revelationType": "Meccan", "numberOfAyahs": 109, "audioSrc": "udio/Q010 - Yunus.mp3" },
         { "id": 11, "name": "Hud", "nameArabic": "هُود", "nameEnglish": "Hud", "revelationType": "Meccan", "numberOfAyahs": 123, "audioSrc": "udio/Q011 - Hud.mp3" },
         { "id": 12, "name": "Yusuf", "nameArabic": "يُوسُف", "nameEnglish": "Joseph", "revelationType": "Meccan", "numberOfAyahs": 111, "audioSrc": "udio/Q012 - Yusuf.mp3" },
         { "id": 13, "name": "Ar-Ra'd", "nameArabic": "ٱلرَّعْد", "nameEnglish": "The Thunder", "revelationType": "Medinan", "numberOfAyahs": 43, "audioSrc": "udio/Q013 - Ar-Ra'ad.mp3" },
@@ -328,12 +316,6 @@
           const volumeSlider = box.querySelector('.volume-slider');
           const repeatBtn = box.querySelector('.repeat-btn');
 
-          // Check if audio source is valid before attempting playback
-          audio.addEventListener('error', (e) => {
-            console.error('Audio error:', e);
-            alert(`Failed to load audio for ${box.querySelector('h2').textContent}. Please check if the file exists at "${audio.src}" or try again later.`);
-          });
-
           playPauseBtn.addEventListener('click', () => {
             if (audio.paused) {
               if (currentPlayingAudio && currentPlayingAudio !== audio) {
@@ -342,18 +324,7 @@
                 oldAudio.loop = false;
                 oldAudio.closest('.surah-box')?.querySelector('.repeat-btn').classList.remove('is-active');
               }
-              audio.play().catch(error => {
-                console.error('Audio playback failed:', error);
-                let errorMessage = 'Failed to play audio. ';
-                if (error.name === 'NotFoundError') {
-                  errorMessage += `The file "${audio.src}" could not be found. Please ensure the file exists.`;
-                } else if (error.name === 'NotAllowedError') {
-                  errorMessage += 'Playback was blocked. Please allow autoplay or interact with the page first.';
-                } else {
-                  errorMessage += 'Please check your network connection or try again later.';
-                }
-                alert(errorMessage);
-              });
+              audio.play();
               currentPlayingAudio = audio;
             } else {
               audio.pause();
@@ -394,7 +365,7 @@
           };
 
           progressBarContainer.addEventListener('click', (e) => {
-            if (isNaN(audio.duration)) return;
+            if(isNaN(audio.duration)) return;
             const rect = progressBarContainer.getBoundingClientRect();
             audio.currentTime = ((e.clientX - rect.left) / progressBarContainer.offsetWidth) * audio.duration;
           });
